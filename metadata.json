@@ -1,0 +1,6 @@
+{
+  "name": "Aura Rosé — Catálogo Deportivo Femenino",
+  "description": "Catálogo profesional de ropa deportiva femenina con estética delicada, femenina y elegante en tonos palo de rosa, rosa empolvado, nude, beige y detalles dorados.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
