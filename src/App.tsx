@@ -29,9 +29,27 @@ export default function App() {
     try {
       const saved = localStorage.getItem(STORAGE_PRODUCTS_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved) as CatalogProduct[];
-        if (Array.isArray(parsed) && parsed.length === INITIAL_PRODUCTS.length) {
-          return parsed;
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return INITIAL_PRODUCTS.map((base) => {
+            const match = parsed.find(
+              (item): item is Partial<CatalogProduct> =>
+                Boolean(item && typeof item === 'object' && item.id === base.id)
+            );
+            if (!match) return base;
+            return {
+              ...base,
+              priceCop:
+                typeof match.priceCop === 'number' && Number.isFinite(match.priceCop) && match.priceCop > 0
+                  ? match.priceCop
+                  : null,
+              reference: typeof match.reference === 'string' ? match.reference : '',
+              shortDescription:
+                typeof match.shortDescription === 'string' && match.shortDescription.trim()
+                  ? match.shortDescription
+                  : base.shortDescription,
+            };
+          });
         }
       }
     } catch {
@@ -44,7 +62,23 @@ export default function App() {
     try {
       const saved = localStorage.getItem(STORAGE_SETTINGS_KEY);
       if (saved) {
-        return { ...DEFAULT_STORE_SETTINGS, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return {
+            storeName:
+              typeof parsed.storeName === 'string'
+                ? parsed.storeName
+                : DEFAULT_STORE_SETTINGS.storeName,
+            collectionSubtitle:
+              typeof parsed.collectionSubtitle === 'string'
+                ? parsed.collectionSubtitle
+                : DEFAULT_STORE_SETTINGS.collectionSubtitle,
+            coverDescription:
+              typeof parsed.coverDescription === 'string'
+                ? parsed.coverDescription
+                : DEFAULT_STORE_SETTINGS.coverDescription,
+          };
+        }
       }
     } catch {
       // ignore
@@ -56,7 +90,20 @@ export default function App() {
     try {
       const saved = localStorage.getItem(STORAGE_SELECTION_KEY);
       if (saved) {
-        return JSON.parse(saved) as SelectionItem[];
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(
+            (item): item is SelectionItem =>
+              Boolean(
+                item &&
+                  typeof item.productId === 'string' &&
+                  typeof item.colorName === 'string' &&
+                  typeof item.size === 'string' &&
+                  typeof item.quantity === 'number' &&
+                  item.quantity > 0
+              )
+          );
+        }
       }
     } catch {
       // ignore
